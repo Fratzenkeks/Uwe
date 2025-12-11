@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Soundalerts Mania Countdown</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#ffcc00;
+      --text:#e6eef8;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{display:flex;align-items:center;justify-content:center;background:
+      radial-gradient(1200px 600px at 10% 10%, rgba(255,200,0,0.06), transparent),
+      linear-gradient(180deg,#071025 0%, #0f1724 100%);color:var(--text)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:36px;border-radius:14px;box-shadow:0 10px 30px rgba(2,6,23,0.6);max-width:720px;width:92%;text-align:center}
+    h1{margin:0 0 8px;font-size:clamp(20px,4vw,36px)}
+    p.lead{margin:0 0 24px;color:#b6c6db}
+    .timer{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .seg{background:var(--card);padding:18px 22px;border-radius:10px;min-width:90px}
+    .num{font-size:clamp(20px,3vw,36px);font-weight:700;color:var(--accent)}
+    .lbl{font-size:12px;color:#9fb0cc;margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+    footer{margin-top:18px;color:#8399b8;font-size:13px}
+    .past{color:#ff6b6b}
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Countdown">
+    <h1>Soundalerts Mania Countdown</h1>
+    <p class="lead">Noch bis zum großen Soundalerts Mania-Moment</p>
+
+    <div id="timer" class="timer" aria-live="polite">
+      <div class="seg"><div class="num" id="days">0</div><div class="lbl">Tage</div></div>
+      <div class="seg"><div class="num" id="hours">0</div><div class="lbl">Stunden</div></div>
+      <div class="seg"><div class="num" id="minutes">0</div><div class="lbl">Minuten</div></div>
+      <div class="seg"><div class="num" id="seconds">0</div><div class="lbl">Sekunden</div></div>
+    </div>
+
+    <footer id="message">Countdown läuft…</footer>
+  </div>
+
+  <script>
+    // === ANPASSEN: Zielzeit setzen ===
+    // Nutze ISO Zeit: YYYY-MM-DDTHH:mm:ssZ (Z = UTC). Oder ohne Z -> lokale Zeit.
+    // Beispiel: 2025-11-27 18:00 UTC -> '2025-11-27T18:00:00Z'
+    const TARGET_ISO = '2025-12-17T22:00:00Z';
+
+    const target = new Date(TARGET_ISO).getTime();
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    const message = document.getElementById('message');
+
+    function update() {
+      const now = Date.now();
+      let diff = target - now;
+
+      if (isNaN(target)) {
+        message.textContent = 'Ungültiges Datum in TARGET_ISO — bitte anpassen.';
+        message.classList.add('past');
+        clearInterval(interval);
+        return;
+      }
+
+      if (diff <= 0) {
+        // Ziel erreicht oder in der Vergangenheit
+        daysEl.textContent = '0';
+        hoursEl.textContent = '0';
+        minutesEl.textContent = '0';
+        secondsEl.textContent = '0';
+        message.textContent = 'Der Moment ist da! 🎉';
+        message.classList.remove('past');
+        clearInterval(interval);
+        return;
+      }
+
+      const sec = Math.floor(diff / 1000);
+      const days = Math.floor(sec / (24*3600));
+      const hours = Math.floor((sec % (24*3600)) / 3600);
+      const minutes = Math.floor((sec % 3600) / 60);
+      const seconds = sec % 60;
+
+      daysEl.textContent = days;
+      hoursEl.textContent = String(hours).padStart(2,'0');
+      minutesEl.textContent = String(minutes).padStart(2,'0');
+      secondsEl.textContent = String(seconds).padStart(2,'0');
+      message.textContent = 'Countdown läuft…';
+    }
+
+    update();
+    const interval = setInterval(update, 1000);
+  </script>
+</body>
+</html>
